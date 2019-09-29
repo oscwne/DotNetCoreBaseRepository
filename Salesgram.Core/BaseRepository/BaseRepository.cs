@@ -10,9 +10,13 @@ namespace Salesgram.Core.BaseRepository
     public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
     {
         private readonly DbContext _context;
-        public BaseRepository(DbContext context)
+
+        public DbSet<TEntity> DbSet { get; }
+
+        protected BaseRepository(DbContext context)
         {
             _context = context;
+            DbSet = _context.Set<TEntity>();
         }
 
         /// <summary>
@@ -23,7 +27,7 @@ namespace Salesgram.Core.BaseRepository
         /// <returns></returns>
         public virtual async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null, Expression<Func<TEntity, object>>[] navigationProperties = null)
         {
-            IQueryable<TEntity> query = _context.Set<TEntity>();
+            IQueryable<TEntity> query = DbSet;
 
             if (filter != null)
             {
@@ -48,7 +52,7 @@ namespace Salesgram.Core.BaseRepository
         /// <returns></returns>
         public virtual async Task<TEntity> GetByIdAsync(object id)
         {
-            return await _context.Set<TEntity>().FindAsync(id);
+            return await DbSet.FindAsync(id);
         }
     }
 }
